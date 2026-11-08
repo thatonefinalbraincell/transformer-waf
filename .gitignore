@@ -1,0 +1,76 @@
+# ==========================================
+# Private Project Guide & Viva Notes
+# ==========================================
+PROJECT_GUIDE_AND_VIVA_PREPARATION.txt
+*.txt.bak
+
+# ==========================================
+# Large Model Weights & Checkpoints (>100MB)
+# (Do not commit binary weights to GitHub)
+# ==========================================
+models/distilbert_waf/*.safetensors
+models/distilbert_waf/*.bin
+models/distilbert_waf/*.pt
+models/distilbert_waf/checkpoints/
+models/baseline/*.joblib
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.joblib
+*.zip
+*.tar.gz
+
+# ==========================================
+# Database & Runtime State
+# ==========================================
+backend/waf.db
+*.db
+*.sqlite
+*.sqlite3
+
+# ==========================================
+# Environment Variables & Secrets
+# ==========================================
+.env
+.env.local
+.env.*.local
+
+# ==========================================
+# Python Compilation & Caches
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# ==========================================
+# Virtual Environments
+# ==========================================
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ==========================================
+# Jupyter & Colab Checkpoints
+# ==========================================
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# ==========================================
+# Operating System & Editor Files
+# ==========================================
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo

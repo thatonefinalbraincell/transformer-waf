@@ -1,0 +1,137 @@
+[
+  {
+    "method": "POST",
+    "path": "/api/v1/search",
+    "params": "",
+    "body": "{\"file\": \"& net user\"}",
+    "normalized_text": "METHOD: POST | PATH: /api/v1/search | HEADERS: user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36; content-type=application/json | BODY: {\"file\": \"& net user\"}",
+    "expected_label": 1,
+    "attack_type": "cmdi"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/search",
+    "params": "category=' UNION SELECT null, username, password FROM users --",
+    "body": "",
+    "normalized_text": "METHOD: GET | PATH: /api/v1/search | PARAMS: category=' UNION SELECT null, username, password FROM users -- | HEADERS: user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15",
+    "expected_label": 1,
+    "attack_type": "sqli"
+  },
+  {
+    "method": "GET",
+    "path": "/order/lookup",
+    "params": "query=101",
+    "body": "",
+    "normalized_text": "METHOD: GET | PATH: /order/lookup | PARAMS: query=101 | HEADERS: user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "expected_label": 0,
+    "attack_type": "benign"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/auth/login",
+    "params": "id=books",
+    "body": "",
+    "normalized_text": "METHOD: GET | PATH: /api/v1/auth/login | PARAMS: id=books | HEADERS: user-agent=Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
+    "expected_label": 0,
+    "attack_type": "benign"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/products",
+    "params": "q=<iframe src=\"javascript:alert(`XSS`)\"></iframe>",
+    "body": "",
+    "normalized_text": "METHOD: GET | PATH: /api/v1/products | PARAMS: q=<iframe src=\"javascript:alert(`XSS`)\"></iframe> | HEADERS: user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15",
+    "expected_label": 1,
+    "attack_type": "xss"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/products",
+    "params": "file=' OR EXISTS(SELECT * FROM users WHERE username='admin' AND SUBSTRING(password,1,1)='a')--",
+    "body": "",
+    "normalized_text": "METHOD: GET | PATH: /api/v1/products | PARAMS: file=' OR EXISTS(SELECT * FROM users WHERE username='admin' AND SUBSTRING(password,1,1)='a')-- | HEADERS: user-agent=Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
+    "expected_label": 1,
+    "attack_type": "sqli"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/products",
+    "params": "",
+    "body": "{\"page\": \"..%252f..%252f..%252fetc%252fpasswd\"}",
+    "normalized_text": "METHOD: POST | PATH: /api/v1/products | HEADERS: user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36; content-type=application/json | BODY: {\"page\": \"../../../etc/passwd\"}",
+    "expected_label": 1,
+    "attack_type": "path_traversal"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/search",
+    "params": "",
+    "body": "{\"username\": \"alex.smith\", \"password\": \"SecurePassword113!\"}",
+    "normalized_text": "METHOD: POST | PATH: /api/v1/search | HEADERS: user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36; content-type=application/json | BODY: {\"username\": \"alex.smith\", \"password\": \"SecurePassword113!\"}",
+    "expected_label": 0,
+    "attack_type": "benign"
+  },
+  {
+    "method": "GET",
+    "path": "/view",
+    "params": "page=/proc/self/cmdline",
+    "body": "",
+    "normalized_text": "METHOD: GET | PATH: /view | PARAMS: page=/proc/self/cmdline | HEADERS: user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "expected_label": 1,
+    "attack_type": "path_traversal"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/search",
+    "params": "q=/proc/self/cmdline",
+    "body": "",
+    "normalized_text": "METHOD: GET | PATH: /api/v1/search | PARAMS: q=/proc/self/cmdline | HEADERS: user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15",
+    "expected_label": 1,
+    "attack_type": "path_traversal"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/search",
+    "params": "",
+    "body": "{\"search\": \"\" OR \"a\"=\"a\"}",
+    "normalized_text": "METHOD: POST | PATH: /api/v1/search | HEADERS: user-agent=Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0; content-type=application/json | BODY: {\"search\": \"\" OR \"a\"=\"a\"}",
+    "expected_label": 1,
+    "attack_type": "sqli"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/search",
+    "params": "id=<svg/onload=alert('XSS')>",
+    "body": "",
+    "normalized_text": "METHOD: GET | PATH: /api/v1/search | PARAMS: id=<svg/onload=alert('XSS')> | HEADERS: user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "expected_label": 1,
+    "attack_type": "xss"
+  },
+  {
+    "method": "GET",
+    "path": "/view",
+    "params": "q=<script>alert('XSS')</script>",
+    "body": "",
+    "normalized_text": "METHOD: GET | PATH: /view | PARAMS: q=<script>alert('XSS')</script> | HEADERS: user-agent=Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
+    "expected_label": 1,
+    "attack_type": "xss"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/products",
+    "params": "id=| cat /etc/shadow",
+    "body": "",
+    "normalized_text": "METHOD: GET | PATH: /api/v1/products | PARAMS: id=| cat /etc/shadow | HEADERS: user-agent=Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
+    "expected_label": 1,
+    "attack_type": "cmdi"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/comments",
+    "params": "search=$(id)",
+    "body": "",
+    "normalized_text": "METHOD: GET | PATH: /api/v1/comments | PARAMS: search=$(id) | HEADERS: user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "expected_label": 1,
+    "attack_type": "cmdi"
+  }
+]

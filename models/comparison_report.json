@@ -1,0 +1,47 @@
+{
+  "baseline": {
+    "model_name": "TF-IDF + Logistic Regression",
+    "metrics": {
+      "accuracy": 0.9976,
+      "precision": 1.0,
+      "recall": 0.9953,
+      "f1_score": 0.9977,
+      "false_positive_rate": 0.0,
+      "false_negative_rate": 0.0047,
+      "confusion_matrix": {
+        "true_negatives": 394,
+        "false_positives": 0,
+        "false_negatives": 2,
+        "true_positives": 428
+      }
+    },
+    "latency_ms": {
+      "mean": 2.13,
+      "p50": 1.92,
+      "p95": 3.43,
+      "p99": 5.0
+    },
+    "attack_breakdown": {
+      "benign": {
+        "total_samples": 394,
+        "detection_accuracy": 1.0
+      },
+      "cmdi": {
+        "total_samples": 107,
+        "detection_accuracy": 1.0
+      },
+      "path_traversal": {
+        "total_samples": 106,
+        "detection_accuracy": 0.9811
+      },
+      "sqli": {
+        "total_samples": 109,
+        "detection_accuracy": 1.0
+      },
+      "xss": {
+        "total_samples": 108,
+        "detection_accuracy": 1.0
+      }
+    }
+  }
+}

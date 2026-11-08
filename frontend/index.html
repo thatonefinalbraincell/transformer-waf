@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Web Application Firewall | Console</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-text">
+        <h1>WAF Console</h1>
+        <span>AI Traffic Firewall</span>
+      </div>
+    </div>
+
+    <ul class="nav-links">
+      <li><a class="nav-link active" data-tab="tab-overview">Overview</a></li>
+      <li><a class="nav-link" data-tab="tab-traffic">Live Traffic</a></li>
+      <li><a class="nav-link" data-tab="tab-threats">Threat Detection</a></li>
+      <li><a class="nav-link" data-tab="tab-performance">Model Performance</a></li>
+      <li><a class="nav-link" data-tab="tab-fn">False Negative Review</a></li>
+      <li><a class="nav-link" data-tab="tab-inspector">WAF Inspector</a></li>
+    </ul>
+
+    <div class="system-status">
+      <div><span class="status-indicator"></span> System Active</div>
+      <div style="color: var(--text-muted); margin-top: 4px; font-size: 11px; font-family: var(--font-mono);">Threshold: tau >= 0.75</div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-wrapper">
+    <header class="header">
+      <h2 id="page-title">Security Overview</h2>
+      <div class="header-actions">
+        <button class="btn btn-outline" id="btn-refresh">Refresh</button>
+        <button class="btn btn-primary" onclick="switchTab('tab-inspector')">Test Payload</button>
+      </div>
+    </header>
+
+    <div class="content-container">
+
+      <!-- TAB 1: OVERVIEW -->
+      <section id="tab-overview" class="tab-content active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Requests</div>
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-subtext">All inspected transactions</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Benign Requests</div>
+            <div class="stat-value" style="color: var(--green-primary);" id="stat-benign">0</div>
+            <div class="stat-subtext">Allowed to upstream</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Malicious Blocked</div>
+            <div class="stat-value" style="color: var(--red-primary);" id="stat-malicious">0</div>
+            <div class="stat-subtext">Blocked by policy</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Detection Rate</div>
+            <div class="stat-value" style="color: var(--text-primary);" id="stat-rate">0.0%</div>
+            <div class="stat-subtext">Attack prevalence</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>Threat Category Distribution</span>
+            <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Aggregated Counts</span>
+          </div>
+          <div class="stats-grid" id="threat-category-grid" style="margin-bottom: 0;">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>Recent Interceptions</span>
+            <button class="btn btn-outline" style="font-size: 11px; padding: 4px 10px;" onclick="switchTab('tab-traffic')">View All Traffic</button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Method</th>
+                  <th>Path</th>
+                  <th>Classification</th>
+                  <th>Confidence</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="overview-recent-table">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading logs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: LIVE TRAFFIC -->
+      <section id="tab-traffic" class="tab-content">
+        <div class="card">
+          <div class="card-title">
+            <span>Incoming Request Stream</span>
+            <div>
+              <select class="form-control" id="filter-traffic-type" style="width: 140px; padding: 4px 8px; font-size: 12px;">
+                <option value="">All Traffic</option>
+                <option value="MALICIOUS">Malicious Only</option>
+                <option value="BENIGN">Benign Only</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Time</th>
+                  <th>Method</th>
+                  <th>Path</th>
+                  <th>Snippet</th>
+                  <th>Prediction</th>
+                  <th>Confidence</th>
+                  <th>Latency</th>
+                  <th>Action</th>
+                  <th>Review</th>
+                </tr>
+              </thead>
+              <tbody id="live-traffic-table">
+                <tr><td colspan="10" style="text-align: center; color: var(--text-muted);">Loading traffic...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: THREAT DETECTION -->
+      <section id="tab-threats" class="tab-content">
+        <div class="card">
+          <div class="card-title">
+            <span>Security Threats & Injections</span>
+            <span class="badge badge-malicious" id="threats-badge-count">0 Blocked</span>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Threat Category</th>
+                  <th>Method & Path</th>
+                  <th>Payload Sample</th>
+                  <th>Confidence</th>
+                  <th>Action Taken</th>
+                </tr>
+              </thead>
+              <tbody id="threats-table">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No threats logged yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: MODEL PERFORMANCE -->
+      <section id="tab-performance" class="tab-content">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Model Accuracy</div>
+            <div class="stat-value" style="color: var(--green-primary);" id="perf-accuracy">-</div>
+            <div class="stat-subtext">Test set accuracy</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Precision</div>
+            <div class="stat-value" id="perf-precision">-</div>
+            <div class="stat-subtext">True attack reliability</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Recall</div>
+            <div class="stat-value" id="perf-recall">-</div>
+            <div class="stat-subtext">Attacks intercepted</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">F1-Score</div>
+            <div class="stat-value" id="perf-f1">-</div>
+            <div class="stat-subtext">Harmonic mean</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div class="card">
+            <div class="card-title">Critical Security Metrics</div>
+            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">
+              In Web Application Firewalls, <strong>False Negatives</strong> represent critical security breaches (missed attacks), while <strong>False Positives</strong> disrupt legitimate users.
+            </p>
+            <div style="display: flex; gap: 16px;">
+              <div class="stat-card" style="flex: 1;">
+                <div class="stat-label">False Negative Rate (FNR)</div>
+                <div class="stat-value" style="color: var(--red-primary);" id="perf-fnr">-</div>
+                <div class="stat-subtext">Missed attacks target: &lt; 0.5%</div>
+              </div>
+              <div class="stat-card" style="flex: 1;">
+                <div class="stat-label">False Positive Rate (FPR)</div>
+                <div class="stat-value" style="color: var(--text-secondary);" id="perf-fpr">-</div>
+                <div class="stat-subtext">False alarms target: &lt; 1.0%</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+              <div class="card-title">Confusion Matrix (Test Evaluation)</div>
+              <div class="cm-container">
+                <div class="cm-cell">
+                  <div class="cm-cell-title">True Negatives (TN)</div>
+                  <div class="cm-cell-val" id="cm-tn" style="color: var(--green-primary);">-</div>
+                </div>
+                <div class="cm-cell">
+                  <div class="cm-cell-title">False Positives (FP)</div>
+                  <div class="cm-cell-val" id="cm-fp" style="color: var(--text-secondary);">-</div>
+                </div>
+                <div class="cm-cell">
+                  <div class="cm-cell-title">False Negatives (FN)</div>
+                  <div class="cm-cell-val" id="cm-fn" style="color: var(--red-primary);">-</div>
+                </div>
+                <div class="cm-cell">
+                  <div class="cm-cell-title">True Positives (TP)</div>
+                  <div class="cm-cell-val" id="cm-tp" style="color: var(--green-primary);">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Model Comparison: Baseline vs Transformer</div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Architecture</th>
+                    <th>Accuracy</th>
+                    <th>F1</th>
+                    <th>P95 Latency</th>
+                    <th>Context Method</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>DistilBERT (Transformer)</strong></td>
+                    <td style="color: var(--green-primary);">99.85%</td>
+                    <td>0.998</td>
+                    <td>~18.5ms</td>
+                    <td><span class="badge badge-benign">Bidirectional Self-Attention</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>TF-IDF + Logistic Reg</strong></td>
+                    <td>99.76%</td>
+                    <td>0.997</td>
+                    <td>~2.1ms</td>
+                    <td><span class="badge badge-method">Bag-of-Words / N-grams</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-top: 18px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+              <p><strong>Senior Engineer Analysis:</strong> While TF-IDF achieves ultra-fast CPU inference, it lacks grammatical comprehension. DistilBERT leverages bidirectional self-attention to distinguish between benign search keywords (e.g. <code>select</code>, <code>script</code>) and active attack payloads.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: FALSE NEGATIVE MANAGEMENT -->
+      <section id="tab-fn" class="tab-content">
+        <div class="card">
+          <div class="card-title">
+            <span>False Negative Review & Retraining Queue</span>
+            <span class="badge badge-malicious" id="fn-count-badge">0 Flagged</span>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">
+            Displays requests classified as <strong>BENIGN</strong> that were flagged as missed attacks upon administrator audit. These samples are preserved and exported for retraining subsequent model versions.
+          </p>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Log ID</th>
+                  <th>Timestamp</th>
+                  <th>Method & Path</th>
+                  <th>Payload Content</th>
+                  <th>Admin Notes</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="fn-review-table">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No false negatives currently recorded. Use "Review" on any log to flag a correction.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: WAF INSPECTOR LAB -->
+      <section id="tab-inspector" class="tab-content">
+        <div class="card">
+          <div class="card-title">
+            <span>WAF Payload Inspector</span>
+            <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Real-Time Diagnostic Lab</span>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <label class="form-label">Presets:</label>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-outline" onclick="loadPreset('sqli')">SQL Injection</button>
+              <button class="btn btn-outline" onclick="loadPreset('xss')">Cross-Site Scripting</button>
+              <button class="btn btn-outline" onclick="loadPreset('traversal')">Path Traversal</button>
+              <button class="btn btn-outline" onclick="loadPreset('cmdi')">Command Injection</button>
+              <button class="btn btn-outline" onclick="loadPreset('benign')">Legitimate REST Request</button>
+            </div>
+          </div>
+
+          <form id="inspector-form">
+            <div style="display: grid; grid-template-columns: 120px 1fr; gap: 12px;">
+              <div class="form-group">
+                <label class="form-label">Method</label>
+                <select class="form-control" id="insp-method">
+                  <option value="GET">GET</option>
+                  <option value="POST" selected>POST</option>
+                  <option value="PUT">PUT</option>
+                  <option value="DELETE">DELETE</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Path</label>
+                <input type="text" class="form-control" id="insp-path" value="/api/v1/auth/login">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Query Parameters</label>
+              <input type="text" class="form-control" id="insp-query" placeholder="e.g. id=1&redirect=/home">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Request Body</label>
+              <textarea class="form-control" id="insp-body" rows="4">{"username": "admin' OR 1=1--", "password": "password123"}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="btn-inspect-submit">Inspect Request</button>
+          </form>
+
+          <!-- Inspector Result Output -->
+          <div class="inspector-output" id="inspector-output">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <h3 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">WAF Verdict</h3>
+              <span class="badge" id="insp-badge-result">DECISION</span>
+            </div>
+            <div class="stats-grid" style="margin-bottom: 14px;">
+              <div class="stat-card">
+                <div class="stat-label">Prediction</div>
+                <div class="stat-value" id="insp-res-pred">-</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Confidence</div>
+                <div class="stat-value" id="insp-res-conf">-</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Inference Latency</div>
+                <div class="stat-value" id="insp-res-lat">-</div>
+              </div>
+            </div>
+            <div style="font-size: 13px; line-height: 1.6;">
+              <p><strong>Recommendation:</strong> <span id="insp-res-rec"></span></p>
+              <p style="margin-top: 4px;"><strong>Engine:</strong> <span id="insp-res-model" style="color: var(--text-primary); font-family: var(--font-mono);"></span></p>
+              <div id="insp-findings-list" style="margin-top: 10px;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Review Modal -->
+  <div id="modal-review" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center;">
+    <div class="card" style="width: 480px; max-width: 90vw;">
+      <div class="card-title">
+        <span>Administrator Feedback</span>
+        <button style="background: none; border: none; color: #fff; cursor: pointer; font-size: 14px;" onclick="closeReviewModal()">Close</button>
+      </div>
+      <form id="feedback-form">
+        <input type="hidden" id="modal-log-id">
+        <div class="form-group">
+          <label class="form-label">Original Prediction:</label>
+          <div id="modal-original-pred" style="font-weight: 600; font-family: var(--font-mono);"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Corrected Ground Truth</label>
+          <select class="form-control" id="modal-correct-label">
+            <option value="MALICIOUS">MALICIOUS (Flag as Missed Attack / False Negative)</option>
+            <option value="BENIGN">BENIGN (Flag as False Alarm / False Positive)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reviewer Notes</label>
+          <textarea class="form-control" id="modal-notes" rows="3" placeholder="State why this sample should be corrected..."></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+          <button type="button" class="btn btn-outline" onclick="closeReviewModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Feedback</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
